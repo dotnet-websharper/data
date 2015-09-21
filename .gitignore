@@ -1,0 +1,8 @@
+*.suo
+packages
+**/bin/
+**/obj/
+build/
+tools/packages/
+**/Content/
+**/Scripts/
