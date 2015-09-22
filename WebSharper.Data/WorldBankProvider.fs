@@ -97,11 +97,20 @@ type private ICountryCollection =
         As <| WorldBankRuntime.GetCountry(As x, code, name)
 
 [<Proxy(typeof<Runtime.WorldBank.IIndicators>)>]
-type private IIndicators () = 
+type private IIndicators = 
     
     [<JavaScript; Inline>]
     member x.AsyncGetIndicator(indicator) : Async<Runtime.WorldBank.Indicator> =
         As <| WorldBankRuntime.AsyncGetIndicator(As x, indicator)
+
+[<Proxy(typeof<Runtime.WorldBank.Country>)>]
+type private Country =
+    
+    member x.Name
+        with [<Inline "$this.Name">] get () = X<string>
+
+    member x.Code
+        with [<Inline "$this.Code">] get () = X<string>
 
 [<Proxy(typeof<Runtime.WorldBank.Indicator>)>]
 type private Indicator =

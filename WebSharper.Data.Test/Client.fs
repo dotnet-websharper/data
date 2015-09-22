@@ -14,10 +14,10 @@ module Client =
     let data = WorldBank.GetDataContext()
 
     let countries =
-        [ data.Countries.Austria
-          data.Countries.Hungary
-          data.Countries.``United Kingdom``
-          data.Countries.``United States`` ]
+        [| data.Countries.Austria
+           data.Countries.Hungary
+           data.Countries.``United Kingdom``
+           data.Countries.``United States`` |]
 
     let schoolEnrollment =
         countries
@@ -34,7 +34,9 @@ module Client =
             let g = rand.Next 256
             let b = rand.Next 256
             Color.Rgba(r,g,b,1.)
-        
+
+    let colors = 
+        countries |> Array.map (fun _ -> randomColor ())
 
     let chart =
         let cfg = 
@@ -48,10 +50,23 @@ module Client =
             return
                 data
                 |> Array.map mkData
-                |> Array.map (fun e -> Chart.Line(e).WithStrokeColor(randomColor ()))
+                |> Array.zip colors
+                |> Array.map (fun (c, e) -> Chart.Line(e).WithStrokeColor(c))
                 |> Chart.Combine
                 |> fun c -> Renderers.ChartJs.Render(c, Size = Size(600, 400), Config = cfg)
         }
+
+    let legend =
+        div (colors 
+             |> Array.zip countries
+             |> Array.map (fun (c, color) -> 
+                div [
+                    spanAttr [attr.style <| "width: 15px; height: 15px;
+                                             margin-right: 10px;
+                                             display: inline-block;
+                                             background-color: " + color.ToString()] []
+                    span [text c.Name]
+                ] :> Doc))
 
     let Main =
         let chrt =
@@ -61,6 +76,8 @@ module Client =
             |> Doc.EmbedView
 
         Doc.Concat [
+            h2 [text "Tertiary school enrollment (% gross)"]
             chrt
+            legend
         ]
         |> Doc.RunById "main"
