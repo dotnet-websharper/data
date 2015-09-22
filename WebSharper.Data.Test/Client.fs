@@ -51,7 +51,10 @@ module Client =
                 data
                 |> Array.map mkData
                 |> Array.zip colors
-                |> Array.map (fun (c, e) -> Chart.Line(e).WithStrokeColor(c))
+                |> Array.map (fun (c, e) -> 
+                    Chart.Line(e)
+                        .WithStrokeColor(c)
+                        .WithPointColor(c))
                 |> Chart.Combine
                 |> fun c -> Renderers.ChartJs.Render(c, Size = Size(600, 400), Config = cfg)
         }
