@@ -46,6 +46,7 @@ module Runtime =
 
         static member AsyncGetIndicator(country:WorldBankIndicators, indicator:string) : Async<obj> =
             Async.FromContinuations(fun (ok, ko, _) ->
+                let guid = System.Guid.NewGuid().ToString().ToLower().Replace('-', '_')
                 let wb = country.Context
                 let countryCode = country.Code
                 let url = worldBankUrl wb [ "countries"; countryCode; "indicators"; indicator ] [ "date", "1900:2050"; "format", "jsonp" ]
@@ -54,7 +55,7 @@ module Runtime =
                         Url = url,
                         DataType = DataType.Jsonp,
                         Jsonp = "prefix",
-                        JsonpCallback = "prefix",
+                        JsonpCallback = "jsonp" + guid,
                         Error = (fun (jqXHR, textStatus, error) -> 
                             ko <| System.Exception(textStatus + error)),
                         Success = (fun (data, textStatus, jqXHR) ->
