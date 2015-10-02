@@ -1,10 +1,11 @@
 namespace WebSharper.Data.Test
 
 open WebSharper
-open WebSharper.UI.Next
-open WebSharper.UI.Next.Html
-open WebSharper.UI.Next.Client
-open WebSharper.Charting
+//open WebSharper.UI.Next
+//open WebSharper.UI.Next.Html
+//open WebSharper.UI.Next.Client
+//open WebSharper.Charting
+open WebSharper.JavaScript
 
 open FSharp.Data
 
@@ -13,7 +14,7 @@ module Client =
     type WorldBank = WorldBankDataProvider<Asynchronous=true>
     let data = WorldBank.GetDataContext()
 
-    let countries =
+    (*let countries =
         [| data.Countries.Austria
            data.Countries.Hungary
            data.Countries.``United Kingdom``
@@ -69,10 +70,13 @@ module Client =
                                              display: inline-block;
                                              background-color: " + color.ToString()] []
                     span [text c.Name]
-                ] :> Doc))
+                ] :> Doc))*)
+
+    type Simple = JsonProvider<""" { "name":"John", "age":94 } """>
+    type Numbers = JsonProvider<""" [1, 2, 3, 3.5] """>
 
     let Main =
-        let chrt =
+        (*let chrt =
             chart
             |> View.Const
             |> View.MapAsync id
@@ -83,4 +87,14 @@ module Client =
             chrt
             legend
         ]
-        |> Doc.RunById "main"
+        |> Doc.RunById "main"*)
+
+        Console.Log (Some 12)
+
+        let simple = Simple.Parse(""" { "name":"Tomas", "age":4 } """)
+        Console.Log simple
+        Console.Log simple.Age
+        Console.Log simple.Name
+
+        let nums = Numbers.Parse(""" [1, 45.28, 98.12, 5.345] """)
+        Console.Log (Seq.sum nums)

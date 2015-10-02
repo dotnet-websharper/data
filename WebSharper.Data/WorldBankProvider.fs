@@ -4,7 +4,7 @@ open WebSharper
 open FSharp.Data
 
 [<Proxy(typeof<Runtime.WorldBank.WorldBankData>)>]
-type WorldBankData 
+type private WorldBankData 
     [<Inline "{serviceUrl: $serviceUrl, source: $sources}">] 
     (serviceUrl : string, sources : string) = 
 
@@ -15,7 +15,7 @@ type WorldBankData
         with [<Inline "$0.sources">] get() = failwith "Client-side"
 
 [<JavaScript>]
-module Runtime =
+module private WBRuntime =
     open WebSharper.JQuery
     open WebSharper.JavaScript
 
@@ -74,7 +74,7 @@ module Runtime =
 
 open System.Collections.Generic
 open WebSharper.JavaScript
-open Runtime
+open WBRuntime
 
 [<Proxy(typeof<Runtime.WorldBank.IWorldBankData>)>]
 type private IWorldBankData =

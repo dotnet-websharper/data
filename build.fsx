@@ -19,7 +19,7 @@ let test =
         .References(fun r ->
             [ 
                 r.NuGet("FSharp.Data").Reference() 
-                r.NuGet("WebSharper.Charting").Reference()
+                //r.NuGet("WebSharper.Charting").Reference()
                 r.Project main
             ])
 
