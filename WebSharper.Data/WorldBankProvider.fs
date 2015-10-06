@@ -46,7 +46,7 @@ module private WBRuntime =
 
         static member AsyncGetIndicator(country:WorldBankIndicators, indicator:string) : Async<obj> =
             Async.FromContinuations(fun (ok, ko, _) ->
-                let guid = System.Guid.NewGuid().ToString().ToLower().Replace('-', '_')
+                let guid = randomFunctionName ()
                 let wb = country.Context
                 let countryCode = country.Code
                 let url = worldBankUrl wb [ "countries"; countryCode; "indicators"; indicator ] [ "date", "1900:2050"; "format", "jsonp" ]

@@ -35,11 +35,11 @@
     <DocumentationFile>bin\Release\WebSharper.Data.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Utils.fs" />
     <Compile Include="WorldBankProvider.fs" />
+    <Compile Include="JsonProvider.fs" />
     <None Include="packages.config" />
     <None Include="app.config" />
-    <Compile Include="Utils.fs" />
-    <Compile Include="JsonProvider.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="IntelliFactory.Xml">

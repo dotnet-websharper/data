@@ -7,28 +7,43 @@ open FSharp.Data
 [<JavaScript>]
 module private Utils = 
     let HasProperty (x : obj) (prop : string) = 
-        if JS.TypeOf(x) <> JS.Kind.Undefined then true
+        let v = (?) x prop
+        if JS.TypeOf(v) <> JS.Kind.Undefined then true
         else false
+
+    [<Inline>]
+    let GetPropertyPacked (x : obj) (prop : string) =
+        if HasProperty x prop then Some ((?) x prop)
+        else None
 
 [<JavaScript>]
 module private JSRuntime = 
+    let private matchTag tagCode (value : obj) : option<obj> = 
+        if value ==. null then None
+        elif JS.TypeOf(value) = JS.Kind.Boolean && tagCode = "Boolean" then Some(unbox value)
+        elif JS.TypeOf(value) = JS.Kind.Number && tagCode = "Number" then Some(unbox value)
+        elif JS.TypeOf(value) = JS.Kind.String && tagCode = "Number" then 
+            let v = 1 * As value
+            if JS.IsNaN v then None
+            else Some (As v)
+        elif JS.TypeOf(value) = JS.Kind.String && tagCode = "String" then Some(unbox value)
+        elif Array.IsArray(value) && tagCode = "Array" then Some(unbox value)
+        elif JS.TypeOf(value) = JS.Kind.Object && tagCode = "Record" then Some(unbox value)
+        else None
+
     let GetArrayChildrenByTypeTag(doc : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string, 
                                   mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) : 'T [] = 
-        let matchTag (value : obj) : option<obj> = 
-            if value ==. null then None
-            elif JS.TypeOf(value) = JS.Kind.Boolean && tagCode = "Boolean" then Some(unbox value)
-            elif JS.TypeOf(value) = JS.Kind.Number && tagCode = "Number" then Some(unbox value)
-            elif JS.TypeOf(value) = JS.Kind.String && tagCode = "Number" then Some(unbox (1 * unbox value))
-            elif JS.TypeOf(value) = JS.Kind.String && tagCode = "String" then Some(unbox value)
-            elif Array.IsArray(value) && tagCode = "Array" then Some(unbox value)
-            elif JS.TypeOf(value) = JS.Kind.Object && tagCode = "Record" then Some(unbox value)
-            else None // ??? maybe sometimes fail
         if Array.IsArray doc then 
             doc
             |> unbox
-            |> Array.choose matchTag
+            |> Array.choose (matchTag tagCode)
             |> Array.map (unbox >> mapping.Invoke)
         else failwith "JSON mismatch: Expected Array node"
+
+    let TryGetValueByTypeTag(doc : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string, 
+                             mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) : 'T option =
+        matchTag tagCode doc
+        |> Option.map (unbox >> mapping.Invoke)
     
     let TryGetArrayChildByTypeTag<'T>(doc : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string, 
                                       mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) : 'T option = 
@@ -38,9 +53,17 @@ module private JSRuntime =
         else failwith "JSON mismatch: Expected Array with single or no elements."
     
     let GetArrayChildByTypeTag(value : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string) : Runtime.BaseTypes.IJsonDocument = 
-        let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, System.Func<_, _>(id))
+        let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, As <| FuncWithOnlyThis(fun x -> x))
         if arr.Length = 1 then arr.[0]
         else failwith "JSON mismatch: Expected single value, but found multiple."
+
+[<JavaScript>]
+module private TxtRuntime =
+    let AsyncMap(comp : Async<'A>, mapping : System.Func<'A,'B>) : Async<'B> =
+        async {
+            let! c = comp
+            return mapping.Invoke c
+        }
 
 [<Proxy(typeof<JsonValue>)>]
 type private JsonValueProxy = 
@@ -51,15 +74,18 @@ type private JsonValueProxy =
 [<Proxy(typeof<FSharp.Data.Runtime.BaseTypes.JsonDocument>)>]
 type private JsonDocument = 
     
-    [<Inline; JavaScript>]
-    member x.JsonValue : JsonValue = As x
+    [<Inline "$0">]
+    member x.get_JsonValue() = failwith "client-side"
     
     [<Inline; JavaScript>]
     static member Create(value : JsonValue, path : string) : Runtime.BaseTypes.IJsonDocument = As value
 
     [<Inline; JavaScript>]
-    static member Create(reader:System.IO.TextReader, cultureStr:string): Runtime.BaseTypes.IJsonDocument = 
-        As (JSON.Parse <| As reader)
+    static member Create(reader:System.IO.TextReader, cultureStr:string): Runtime.BaseTypes.IJsonDocument =
+        let data = As<obj> reader 
+        if JS.TypeOf data = JS.Kind.String then 
+            As <| JSON.Parse (As data)
+        else As data
 
 [<Proxy(typeof<FSharp.Data.Runtime.BaseTypes.IJsonDocument>)>]
 type private IJsonDocument = 
@@ -81,8 +107,47 @@ type private JsonValueOptionAndPath =
 
 [<Proxy(typeof<FSharp.Data.Runtime.TextRuntime>)>]
 type private TextRuntime = 
+    [<Inline; JavaScript>]
+    static member AsyncMap (valueAsync:Async<'T>, mapping:System.Func<'T,'R>) : Async<'R> =
+        TxtRuntime.AsyncMap(valueAsync, mapping)
+
     [<Inline"null">]
     static member GetCulture(cultureStr : string) : System.Globalization.CultureInfo = failwith "client-side"
+
+[<WebSharper.Core.Attributes.Proxy
+    "FSharp.Data.Runtime.IO, \
+     FSharp.Data, Culture=neutral, \
+     PublicKeyToken=null">]
+module private IO = 
+    open WebSharper.JQuery
+    
+    [<JavaScript>]
+    let asyncReadTextAtRuntime (forFSI: bool) (defaultResolutionFolder : string) (resolutionFolder : string)
+                               (formatName : string) (encodingStr : string) (uri : string) : Async<System.IO.TextReader> =
+        Async.FromContinuations <| fun (ok, ko, _) ->
+            let (uri, jsonp) = 
+                let l =uri.ToLower()
+                if l.StartsWith("jsonp|")  then uri.Substring(6), true
+                elif l.StartsWith("json|") then uri.Substring(5), false
+                else uri, false
+            let settings = 
+                AjaxSettings(
+                    DataType = DataType.Json,
+                    Success = (fun (data,_,_) -> ok <| As data),
+                    Error = (fun (_,_,err) -> ko <| System.Exception(err)))
+            if jsonp then
+                let fn = randomFunctionName ()
+                settings.DataType <- DataType.Jsonp
+                settings.Jsonp <- "prefix"
+                settings.JsonpCallback <- "jsonp" + fn
+
+            JQuery.Ajax(uri, settings) |> ignore
+
+    [<JavaScript>]
+    let asyncReadTextAtRuntimeWithDesignTimeRules (defaultResolutionFolder : string) 
+                                                  (resolutionFolder : string) (formatName : string) 
+                                                  (encodingStr : string) (uri : string) : Async<System.IO.TextReader> =
+        asyncReadTextAtRuntime false defaultResolutionFolder resolutionFolder formatName encodingStr uri
 
 [<Proxy(typeof<FSharp.Data.Runtime.JsonRuntime>)>]
 type private JsonRuntime = 
@@ -97,13 +162,15 @@ type private JsonRuntime =
     
     [<Inline; JavaScript>]
     static member TryGetPropertyPacked(doc : Runtime.BaseTypes.IJsonDocument, name : string) : Runtime.BaseTypes.IJsonDocument option = 
-        if JS.TypeOf(doc) <> JS.Kind.Undefined then Some <| As((?) doc name)
-        else None
+        Utils.GetPropertyPacked doc name
     
     [<Inline; JavaScript>]
     static member TryGetPropertyUnpackedWithPath(doc:Runtime.BaseTypes.IJsonDocument, name:string) : Runtime.JsonValueOptionAndPath =
-        if JS.TypeOf(doc) <> JS.Kind.Undefined then As <| Some((?) doc name)
-        else As None
+        As <| Utils.GetPropertyPacked doc name
+
+    [<Inline; JavaScript>]
+    static member TryGetPropertyUnpacked (doc:Runtime.BaseTypes.IJsonDocument, name:string): JsonValue option =
+        Utils.GetPropertyPacked doc name
     
     [<Inline; JavaScript>]
     static member ConvertString(cultureStr : string, json : JsonValue option) : string option = As json
@@ -113,16 +180,19 @@ type private JsonRuntime =
     
     [<Inline; JavaScript>]
     static member ConvertFloat(cultureStr : string, missingValuesStr : string, json : JsonValue option) : float option = 
-        As json
+        Option.map (fun e -> 1. * As e) json
     
     [<Inline; JavaScript>]
-    static member ConvertDecimal(cultureStr : string, json : JsonValue option) : decimal option = As json
+    static member ConvertDecimal(cultureStr : string, json : JsonValue option) : decimal option =
+        Option.map (fun e -> As (1. * As e)) json
     
     [<Inline; JavaScript>]
-    static member ConvertInteger(cultureStr : string, json : JsonValue option) : int option = As json
+    static member ConvertInteger(cultureStr : string, json : JsonValue option) : int option =
+        Option.map (fun e -> 1 * As e) json
     
     [<Inline; JavaScript>]
-    static member ConvertInteger64(cultureStr : string, json : JsonValue option) : int64 option = As json
+    static member ConvertInteger64(cultureStr : string, json : JsonValue option) : int64 option =
+        Option.map (fun e -> 1L * As e) json
     
     [<Inline; JavaScript>]
     static member ConvertDateTime(cultureStr : string, json : JsonValue option) : System.DateTime option = As json
@@ -164,4 +234,4 @@ type private JsonRuntime =
     [<Inline; JavaScript>]
     static member TryGetValueByTypeTag(doc : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string, 
                                        mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) : 'T option = 
-        JSRuntime.TryGetArrayChildByTypeTag(doc, cultureStr, tagCode, mapping)
+        JSRuntime.TryGetValueByTypeTag(doc, cultureStr, tagCode, mapping)

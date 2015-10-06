@@ -3,20 +3,19 @@
 open WebSharper
 
 [<Proxy(typeof<System.Func<_,_>>)>]
-type SFunc<'A,'B>
+type private SFunc<'A,'B>
     [<Inline "$f">](f : 'A -> 'B) =
 
-    [<Inline "$0($par)">]
-    member x.Invoke(par: 'A): 'B = failwith "client-side"
+    // The first parameter of a delegate is always translated to
+    // "this" so we need to work around that here.
+    [<Inline "(function(){return $0.call(arguments[0])})($value)">]
+    member x.Invoke(value: 'A): 'B = failwith "client-side"
 
 [<Proxy(typeof<System.IO.StringReader>)>]
-type SReader
+type private SReader
     [<Inline "$s">](s : string) = class end
 
-//[<Proxy(typeof<Microsoft.FSharp.Core.Option<_>>)>]
-//type FSharpOption<'T>
-//    [<Inline "{$: 1, $0: $v}">](v: 'T) =
-//    
-//    [<Inline "{$: 1, $0: $v}">]
-//    static member Some(v : 'T) : Option<'T> = failwith "client-side"
-    
+[<AutoOpen; JavaScript>]
+module Pervasives =
+    let randomFunctionName () =
+        System.Guid.NewGuid().ToString().ToLower().Replace('-', '_')

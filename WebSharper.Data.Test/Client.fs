@@ -74,6 +74,21 @@ module Client =
 
     type Simple = JsonProvider<""" { "name":"John", "age":94 } """>
     type Numbers = JsonProvider<""" [1, 2, 3, 3.5] """>
+    type Mixed = JsonProvider<""" [1, 2, "hello", "world"] """>
+    type People = JsonProvider<""" [{ "name":"John", "age":94 }, { "name":"Tomas" }] """>
+    type Values = JsonProvider<""" [{"value":94 }, {"value":"Tomas" }] """>
+    type WorldBankJson = JsonProvider<"WorldBank.json">
+    type GitHub = JsonProvider<"https://api.github.com/repos/fsharp/FSharp.Data/issues">
+
+    let topRecentlyUpdatedIssues = 
+        async {
+            let! samples = GitHub.AsyncGetSamples()
+            return 
+                samples
+                |> Seq.filter (fun issue -> issue.State = "open")
+                |> Seq.sortBy (fun issue -> System.DateTime.Now - issue.UpdatedAt)
+                |> Seq.truncate 5
+        }
 
     let Main =
         (*let chrt =
@@ -89,8 +104,6 @@ module Client =
         ]
         |> Doc.RunById "main"*)
 
-        Console.Log (Some 12)
-
         let simple = Simple.Parse(""" { "name":"Tomas", "age":4 } """)
         Console.Log simple
         Console.Log simple.Age
@@ -98,3 +111,34 @@ module Client =
 
         let nums = Numbers.Parse(""" [1, 45.28, 98.12, 5.345] """)
         Console.Log (Seq.sum nums)
+
+        let mixed = Mixed.Parse(""" [4, 5, "hello", "world" ] """)
+
+        mixed.Numbers |> Seq.sum |> Console.Log
+        mixed.Strings |> String.concat ", " |> Console.Log
+
+        for item in People.GetSamples() do 
+            Console.Log (item.Name + " " )
+            item.Age |> Option.iter (fun d -> Console.Log <| sprintf "(%d)" d)
+
+        for item in Values.GetSamples() do 
+            match item.Value.Number, item.Value.String with
+            | Some num, _ -> Console.Log <| sprintf "Numeric: %d" num
+            | _, Some str -> Console.Log <| sprintf "Text: %s" str
+            | _ -> Console.Log <| sprintf "Some other value!"
+        
+        let docAsync = WorldBankJson.AsyncLoad("jsonp|http://api.worldbank.org/country/cz/indicator/GC.DOD.TOTL.GD.ZS?format=jsonp")
+        async {
+            let! a = docAsync
+            for record in a.Array do
+                record.Value |> Option.iter (fun v -> 
+                    Console.Log <| sprintf "%d: %f" record.Date v)
+        }
+        |> Async.Start
+
+        async {
+            let! issues = topRecentlyUpdatedIssues
+            for issue in issues do
+                Console.Log <| sprintf "#%d %s" issue.Number issue.Title
+        }
+        |> Async.Start
