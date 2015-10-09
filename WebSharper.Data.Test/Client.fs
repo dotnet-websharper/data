@@ -1,10 +1,10 @@
 namespace WebSharper.Data.Test
 
 open WebSharper
-//open WebSharper.UI.Next
-//open WebSharper.UI.Next.Html
-//open WebSharper.UI.Next.Client
-//open WebSharper.Charting
+open WebSharper.UI.Next
+open WebSharper.UI.Next.Html
+open WebSharper.UI.Next.Client
+open WebSharper.Charting
 open WebSharper.JavaScript
 
 open FSharp.Data
@@ -14,7 +14,7 @@ module Client =
     type WorldBank = WorldBankDataProvider<Asynchronous=true>
     let data = WorldBank.GetDataContext()
 
-    (*let countries =
+    let countries =
         [| data.Countries.Austria
            data.Countries.Hungary
            data.Countries.``United Kingdom``
@@ -70,7 +70,7 @@ module Client =
                                              display: inline-block;
                                              background-color: " + color.ToString()] []
                     span [text c.Name]
-                ] :> Doc))*)
+                ] :> Doc))
 
     type Simple = JsonProvider<""" { "name":"John", "age":94 } """>
     type Numbers = JsonProvider<""" [1, 2, 3, 3.5] """>
@@ -91,7 +91,7 @@ module Client =
         }
 
     let Main =
-        (*let chrt =
+        let chrt =
             chart
             |> View.Const
             |> View.MapAsync id
@@ -102,7 +102,7 @@ module Client =
             chrt
             legend
         ]
-        |> Doc.RunById "main"*)
+        |> Doc.RunById "main"
 
         let simple = Simple.Parse(""" { "name":"Tomas", "age":4 } """)
         Console.Log simple
@@ -119,26 +119,26 @@ module Client =
 
         for item in People.GetSamples() do 
             Console.Log (item.Name + " " )
-            item.Age |> Option.iter (fun d -> Console.Log <| sprintf "(%d)" d)
+            item.Age |> Option.iter (fun d -> printfn "(%d)" d)
 
         for item in Values.GetSamples() do 
             match item.Value.Number, item.Value.String with
-            | Some num, _ -> Console.Log <| sprintf "Numeric: %d" num
-            | _, Some str -> Console.Log <| sprintf "Text: %s" str
-            | _ -> Console.Log <| sprintf "Some other value!"
+            | Some num, _ -> printfn "Numeric: %d" num
+            | _, Some str -> printfn "Text: %s" str
+            | _ -> printfn "Some other value!"
         
         let docAsync = WorldBankJson.AsyncLoad("jsonp|http://api.worldbank.org/country/cz/indicator/GC.DOD.TOTL.GD.ZS?format=jsonp")
         async {
             let! a = docAsync
             for record in a.Array do
                 record.Value |> Option.iter (fun v -> 
-                    Console.Log <| sprintf "%d: %f" record.Date v)
+                    printfn "%d: %f" record.Date v)
         }
         |> Async.Start
 
         async {
             let! issues = topRecentlyUpdatedIssues
             for issue in issues do
-                Console.Log <| sprintf "#%d %s" issue.Number issue.Title
+                printfn "#%d %s" issue.Number issue.Title
         }
         |> Async.Start
