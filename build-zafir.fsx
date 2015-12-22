@@ -21,7 +21,7 @@ let test =
         .References(fun r ->
             [ 
                 r.NuGet("FSharp.Data").Reference() 
-                r.NuGet("Zafir.Charting").Reference()
+                r.NuGet("Zafir.Charting").Latest(true).ForceFoundVersion().Reference()
                 r.Project main
             ])
 
