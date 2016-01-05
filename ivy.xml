@@ -2,6 +2,6 @@
   <info organisation="IntelliFactory" module="websharper.data" revision="3.0" />
   <dependencies>
     <dependency name="websharper" rev="latest.integration" />
-    <dependency name="fsharp.data" rev="latest.integration" />
+    <dependency name="websharper.charting" rev="latest.integration" />
   </dependencies>
 </ivy-module>
