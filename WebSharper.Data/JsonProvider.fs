@@ -114,7 +114,11 @@ type private TextRuntime =
     [<Inline"null">]
     static member GetCulture(cultureStr : string) : System.Globalization.CultureInfo = failwith "client-side"
 
+#if ZAFIR
+[<WebSharper.Proxy
+#else
 [<WebSharper.Core.Attributes.Proxy
+#endif
     "FSharp.Data.Runtime.IO, \
      FSharp.Data, Culture=neutral, \
      PublicKeyToken=null">]

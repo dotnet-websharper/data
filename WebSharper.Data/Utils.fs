@@ -2,6 +2,8 @@
 
 open WebSharper
 
+#if ZAFIR
+#else
 [<Proxy(typeof<System.Func<_,_>>)>]
 type private SFunc<'A,'B>
     [<Inline "$f">](f : 'A -> 'B) =
@@ -10,6 +12,7 @@ type private SFunc<'A,'B>
     // "this" so we need to work around that here.
     [<Inline "(function(){return $0.call(arguments[0])})($value)">]
     member x.Invoke(value: 'A): 'B = failwith "client-side"
+#endif
 
 [<Proxy(typeof<System.IO.StringReader>)>]
 type private SReader
