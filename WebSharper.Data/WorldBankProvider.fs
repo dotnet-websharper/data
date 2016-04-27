@@ -56,9 +56,15 @@ module private WBRuntime =
                         DataType = DataType.Jsonp,
                         Jsonp = "prefix",
                         JsonpCallback = "jsonp" + guid,
+#if ZAFIR
+                        Error = (fun jqXHR textStatus error -> 
+                            ko <| System.Exception(textStatus + error)),
+                        Success = (fun data textStatus jqXHR ->
+#else
                         Error = (fun (jqXHR, textStatus, error) -> 
                             ko <| System.Exception(textStatus + error)),
                         Success = (fun (data, textStatus, jqXHR) ->
+#endif
                             let data = As<obj []> data
                             let res =
                                 (data.[1] :?> obj []) 

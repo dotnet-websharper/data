@@ -6,3 +6,4 @@ build/
 tools/packages/
 **/Content/
 **/Scripts/
+/.vs/config

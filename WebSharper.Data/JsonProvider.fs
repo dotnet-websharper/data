@@ -137,8 +137,13 @@ module private IO =
             let settings = 
                 AjaxSettings(
                     DataType = DataType.Json,
+#if ZAFIR
+                    Success = (fun data _ _  -> ok <| As data),
+                    Error = (fun _ _ err -> ko <| System.Exception(err)))
+#else
                     Success = (fun (data,_,_) -> ok <| As data),
                     Error = (fun (_,_,err) -> ko <| System.Exception(err)))
+#endif
             if jsonp then
                 let fn = randomFunctionName ()
                 settings.DataType <- DataType.Jsonp
