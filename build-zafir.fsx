@@ -13,15 +13,18 @@ let main =
         .SourcesFromProject()
         .References(fun r ->
             [ 
-                r.NuGet("FSharp.Data").Reference() 
+                r.NuGet("FSharp.Data").Version("[2.2.5]").ForceFoundVersion().Reference() 
             ])
 
 let test =
     bt.Zafir.Library("WebSharper.Data.Test")
         .References(fun r ->
             [ 
-                r.NuGet("FSharp.Data").Reference() 
-                r.NuGet("Zafir.Charting").Latest(true).ForceFoundVersion().Reference()
+                r.NuGet("FSharp.Data").Version("[2.2.5]").Reference() 
+                r.NuGet("Zafir.Reactive").Latest(true).Reference()
+                r.NuGet("Zafir.UI.Next").Latest(true).Reference()
+                r.NuGet("Zafir.ChartJs").Latest(true).Reference()
+                r.NuGet("Zafir.Charting").Latest(true).Reference()
                 r.Project main
             ])
 

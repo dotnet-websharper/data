@@ -10,6 +10,7 @@ open WebSharper.JavaScript
 open FSharp.Data
 
 [<JavaScript>]
+
 module Client =    
     type WorldBank = WorldBankDataProvider<Asynchronous=true>
     let data = WorldBank.GetDataContext()
@@ -22,19 +23,15 @@ module Client =
 
     let schoolEnrollment =
         countries
-        |> Seq.map (fun c -> c.Indicators.``School enrollment, tertiary (% gross)``)
+        |> Seq.map (fun c -> c.Indicators.``Out-of-school children of primary school age, both sexes (number)``)
         |> Async.Parallel
 
-    let mkData (i : Runtime.WorldBank.Indicator) =
-        Seq.zip (Seq.map string i.Years) i.Values
-
-    let randomColor =
-        let rand = System.Random()
-        fun () ->
-            let r = rand.Next 256
-            let g = rand.Next 256
-            let b = rand.Next 256
-            Color.Rgba(r,g,b,1.)
+    let rand = System.Random()
+    let randomColor () =
+        let r = rand.Next 256
+        let g = rand.Next 256
+        let b = rand.Next 256
+        Color.Rgba(r,g,b,1.)
 
     let colors = 
         countries |> Array.map (fun _ -> randomColor ())
@@ -50,7 +47,9 @@ module Client =
             let! data = schoolEnrollment
             return
                 data
-                |> Array.map mkData
+                |> Array.map (fun i ->
+                    Seq.zip (Seq.map string i.Years) i.Values
+                )
                 |> Array.zip colors
                 |> Array.map (fun (c, e) -> 
                     Chart.Line(e)
@@ -90,11 +89,15 @@ module Client =
                 |> Seq.truncate 5
         }
 
+#if ZAFIR
+    [<SPAEntryPoint>]
+    let Main() =
+#else
     let Main =
+#endif
         let chrt =
             chart
-            |> View.Const
-            |> View.MapAsync id
+            |> View.ConstAsync
             |> Doc.EmbedView
 
         Doc.Concat [

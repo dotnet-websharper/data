@@ -1,6 +1,7 @@
 ﻿namespace WebSharper.Data
 
 open WebSharper
+open WebSharper.JavaScript
 open FSharp.Data
 
 [<Proxy(typeof<Runtime.WorldBank.WorldBankData>)>]
@@ -9,15 +10,14 @@ type private WorldBankData
     (serviceUrl : string, sources : string) = 
 
     member x.ServiceUrl
-        with [<Inline "$0.serviceUrl">] get() = failwith "Client-side"
+        with [<Inline "$0.serviceUrl">] get() = X<string>
 
     member x.Sources
-        with [<Inline "$0.sources">] get() = failwith "Client-side"
+        with [<Inline "$0.sources">] get() = X<obj>
 
 [<JavaScript>]
 module private WBRuntime =
     open WebSharper.JQuery
-    open WebSharper.JavaScript
 
     type WorldBankCountries = WorldBankData
 
@@ -130,7 +130,7 @@ type private Indicator =
     member x.TryGetValueAt (year : int) =
         let e = (?) x (string year)
         if e ==. JS.Undefined then None
-        else Some <| As e
+        else Some <| As<double> e
 
     member x.Years 
         with [<JavaScript; Inline>] get () =

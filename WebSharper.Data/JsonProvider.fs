@@ -75,7 +75,7 @@ type private JsonValueProxy =
 type private JsonDocument = 
     
     [<Inline "$0">]
-    member x.get_JsonValue() = failwith "client-side"
+    member x.get_JsonValue() = X<FSharp.Data.JsonValue>
     
     [<Inline; JavaScript>]
     static member Create(value : JsonValue, path : string) : Runtime.BaseTypes.IJsonDocument = As value
@@ -91,19 +91,19 @@ type private JsonDocument =
 type private IJsonDocument = 
     
     [<Inline "\"\"">]
-    member x.Path() : string = failwith "client-side"
+    member x.Path() = X<string>
 
     [<Inline "$0">]
-    member x.get_JsonValue() : JsonValue = failwith "client-side"
+    member x.get_JsonValue() = X<JsonValue>
 
 [<Proxy(typeof<FSharp.Data.Runtime.JsonValueOptionAndPath>)>]
 type private JsonValueOptionAndPath = 
     
     [<Inline "\"\"">]
-    member x.get_Path() : string = failwith "client-side"
+    member x.get_Path() = X<string>
         
     [<Inline "$0">]
-    member x.get_JsonOpt() : JsonValue option = failwith "client-side"
+    member x.get_JsonOpt() = X<JsonValue option>
 
 [<Proxy(typeof<FSharp.Data.Runtime.TextRuntime>)>]
 type private TextRuntime = 
@@ -112,7 +112,7 @@ type private TextRuntime =
         TxtRuntime.AsyncMap(valueAsync, mapping)
 
     [<Inline"null">]
-    static member GetCulture(cultureStr : string) : System.Globalization.CultureInfo = failwith "client-side"
+    static member GetCulture(cultureStr : string) = X<System.Globalization.CultureInfo>
 
 #if ZAFIR
 [<WebSharper.Proxy
@@ -162,12 +162,10 @@ module private IO =
 type private JsonRuntime = 
     
     [<Inline"$doc[$name]">]
-    static member GetPropertyPacked(doc : Runtime.BaseTypes.IJsonDocument, name : string) : Runtime.BaseTypes.IJsonDocument = 
-        failwith "client-side"
+    static member GetPropertyPacked(doc : Runtime.BaseTypes.IJsonDocument, name : string) = X<Runtime.BaseTypes.IJsonDocument>
     
     [<Inline"$doc[$name]">]
-    static member GetPropertyPackedOrNull(doc : Runtime.BaseTypes.IJsonDocument, name : string) : Runtime.BaseTypes.IJsonDocument = 
-        failwith "client-side"
+    static member GetPropertyPackedOrNull(doc : Runtime.BaseTypes.IJsonDocument, name : string) = X<Runtime.BaseTypes.IJsonDocument>
     
     [<Inline; JavaScript>]
     static member TryGetPropertyPacked(doc : Runtime.BaseTypes.IJsonDocument, name : string) : Runtime.BaseTypes.IJsonDocument option = 
@@ -222,8 +220,7 @@ type private JsonRuntime =
     
     [<Inline"$doc">]
     static member ConvertArray(doc : Runtime.BaseTypes.IJsonDocument, 
-                               mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) : 'T [] = 
-        failwith "client-side"
+                               mapping : System.Func<Runtime.BaseTypes.IJsonDocument, 'T>) = X<'T []>
     
     [<Inline; JavaScript>]
     static member ConvertOptionalProperty(doc : Runtime.BaseTypes.IJsonDocument, name : string, 
