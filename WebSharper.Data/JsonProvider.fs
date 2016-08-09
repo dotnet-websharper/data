@@ -6,10 +6,8 @@ open FSharp.Data
 
 [<JavaScript>]
 module private Utils = 
-    let HasProperty (x : obj) (prop : string) = 
-        let v = (?) x prop
-        if JS.TypeOf(v) <> JS.Kind.Undefined then true
-        else false
+    [<Inline "$prop in $x" >]
+    let HasProperty (x : obj) (prop : string) = X<bool>
 
     [<Inline>]
     let GetPropertyPacked (x : obj) (prop : string) =
@@ -53,7 +51,11 @@ module private JSRuntime =
         else failwith "JSON mismatch: Expected Array with single or no elements."
     
     let GetArrayChildByTypeTag(value : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string) : Runtime.BaseTypes.IJsonDocument = 
+#if ZAFIR
+        let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, As <| fun x -> x)
+#else
         let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, As <| FuncWithOnlyThis(fun x -> x))
+#endif
         if arr.Length = 1 then arr.[0]
         else failwith "JSON mismatch: Expected single value, but found multiple."
 

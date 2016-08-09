@@ -133,6 +133,8 @@ module Client =
         let docAsync = WorldBankJson.AsyncLoad("jsonp|http://api.worldbank.org/country/cz/indicator/GC.DOD.TOTL.GD.ZS?format=jsonp")
         async {
             let! a = docAsync
+            Console.Log("doc", a)
+            Console.Log("doc.Array", a.Array)
             for record in a.Array do
                 record.Value |> Option.iter (fun v -> 
                     printfn "%d: %f" record.Date v)

@@ -38,7 +38,6 @@
     <Compile Include="Utils.fs" />
     <Compile Include="WorldBankProvider.fs" />
     <Compile Include="JsonProvider.fs" />
-    <None Include="app.config" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
