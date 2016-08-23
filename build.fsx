@@ -13,14 +13,14 @@ let main =
         .SourcesFromProject()
         .References(fun r ->
             [ 
-                r.NuGet("FSharp.Data").Reference() 
+                r.NuGet("FSharp.Data").Version("[2.2.5]").ForceFoundVersion().Reference() 
             ])
 
 let test =
     bt.WebSharper.Library("WebSharper.Data.Test")
         .References(fun r ->
             [ 
-                r.NuGet("FSharp.Data").Reference() 
+                r.NuGet("FSharp.Data").Version("[2.2.5]").Reference() 
                 r.NuGet("WebSharper.Charting").Reference()
                 r.Project main
             ])
