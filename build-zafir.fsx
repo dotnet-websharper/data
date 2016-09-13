@@ -11,6 +11,8 @@ let bt =
 let main =
     bt.Zafir.Library("WebSharper.Data")
         .SourcesFromProject()
+        .WithSourceMap()
+
         .References(fun r ->
             [ 
                 r.NuGet("FSharp.Data").Version("[2.2.5]").ForceFoundVersion().Reference() 
