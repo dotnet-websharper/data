@@ -54,8 +54,8 @@ module private WBRuntime =
                     AjaxSettings(
                         Url = url,
                         DataType = DataType.Jsonp,
-                        Jsonp = "prefix",
-                        JsonpCallback = "jsonp" + guid,
+                        Jsonp = Choice2Of2 "prefix",
+                        JsonpCallback = Choice2Of2 ("jsonp" + guid),
 #if ZAFIR
                         Error = (fun jqXHR textStatus error -> 
                             ko <| System.Exception(textStatus + error)),
