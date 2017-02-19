@@ -149,8 +149,13 @@ module private IO =
             if jsonp then
                 let fn = randomFunctionName ()
                 settings.DataType <- DataType.Jsonp
-                settings.Jsonp <- Choice2Of2 "prefix"
-                settings.JsonpCallback <- Choice2Of2 ("jsonp" + fn)
+#if ZAFIR
+                settings.Jsonp <- Union2Of2 "prefix"
+                settings.JsonpCallback <- Union2Of2 ("jsonp" + fn)
+#else
+                settings.Jsonp <- "prefix"
+                settings.JsonpCallback <- ("jsonp" + fn)
+#endif
 
             JQuery.Ajax(uri, settings) |> ignore
 
