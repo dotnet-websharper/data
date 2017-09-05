@@ -4,7 +4,7 @@ open IntelliFactory.Build
 
 let bt =
     BuildTool().PackageId("WebSharper.Data")
-        .VersionFrom("WebSharper")
+        .VersionFrom("WebSharper", versionSpec = "(,4.0)")
         .WithFSharpVersion(FSharpVersion.FSharp30)
         .WithFramework(fun fw -> fw.Net45)
 
@@ -21,7 +21,7 @@ let test =
         .References(fun r ->
             [ 
                 r.NuGet("FSharp.Data").Version("[2.2.5]").Reference() 
-                r.NuGet("WebSharper.Charting").Reference()
+                r.NuGet("WebSharper.Charting").Version("(,4.0)").Reference()
                 r.Project main
             ])
 

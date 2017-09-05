@@ -3,13 +3,13 @@
 open IntelliFactory.Build
 
 let bt =
-    BuildTool().PackageId("Zafir.Data")
-        .VersionFrom("Zafir")
+    BuildTool().PackageId("WebSharper.Data")
+        .VersionFrom("WebSharper")
         .WithFSharpVersion(FSharpVersion.FSharp30)
         .WithFramework(fun fw -> fw.Net45)
 
 let main =
-    bt.Zafir.Library("WebSharper.Data")
+    bt.WebSharper4.Library("WebSharper.Data")
         .SourcesFromProject()
         .WithSourceMap()
 
@@ -19,14 +19,14 @@ let main =
             ])
 
 let test =
-    bt.Zafir.Library("WebSharper.Data.Test")
+    bt.WebSharper4.Library("WebSharper.Data.Test")
         .References(fun r ->
             [ 
                 r.NuGet("FSharp.Data").Version("[2.2.5]").Reference() 
-                r.NuGet("Zafir.Reactive").Latest(true).Reference()
-                r.NuGet("Zafir.UI.Next").Latest(true).Reference()
-                r.NuGet("Zafir.ChartJs").Latest(true).Reference()
-                r.NuGet("Zafir.Charting").Latest(true).Reference()
+                r.NuGet("WebSharper.Reactive").Latest(true).Reference()
+                r.NuGet("WebSharper.UI.Next").Latest(true).Reference()
+                r.NuGet("WebSharper.ChartJs").Latest(true).Reference()
+                r.NuGet("WebSharper.Charting").Latest(true).Reference()
                 r.Project main
             ])
 
@@ -37,10 +37,10 @@ bt.Solution [
     bt.NuGet.CreatePackage()
         .Configure(fun configuration ->
             { configuration with
-                Title = Some "Zafir.Data"
+                Title = Some "WebSharper.Data"
                 LicenseUrl = Some "http://websharper.com/licensing"
                 ProjectUrl = Some "https://github.com/intellifactory/websharper.data"
-                Description = "FSharp.Data proxies for Zafir"
+                Description = "FSharp.Data proxies for WebSharper"
                 Authors = [ "IntelliFactory" ]
                 RequiresLicenseAcceptance = true })
         .Add(main)
