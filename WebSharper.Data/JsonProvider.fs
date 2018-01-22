@@ -51,11 +51,7 @@ module private JSRuntime =
         else failwith "JSON mismatch: Expected Array with single or no elements."
     
     let GetArrayChildByTypeTag(value : Runtime.BaseTypes.IJsonDocument, cultureStr : string, tagCode : string) : Runtime.BaseTypes.IJsonDocument = 
-#if ZAFIR
         let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, As <| fun x -> x)
-#else
-        let arr = GetArrayChildrenByTypeTag(value, cultureStr, tagCode, As <| FuncWithOnlyThis(fun x -> x))
-#endif
         if arr.Length = 1 then arr.[0]
         else failwith "JSON mismatch: Expected single value, but found multiple."
 
@@ -116,11 +112,7 @@ type private TextRuntime =
     [<Inline"null">]
     static member GetCulture(cultureStr : string) = X<System.Globalization.CultureInfo>
 
-#if ZAFIR
 [<WebSharper.Proxy
-#else
-[<WebSharper.Core.Attributes.Proxy
-#endif
     "FSharp.Data.Runtime.IO, \
      FSharp.Data, Culture=neutral, \
      PublicKeyToken=null">]
@@ -139,23 +131,13 @@ module private IO =
             let settings = 
                 AjaxSettings(
                     DataType = DataType.Json,
-#if ZAFIR
                     Success = (fun data _ _  -> ok <| As data),
                     Error = (fun _ _ err -> ko <| System.Exception(err)))
-#else
-                    Success = (fun (data,_,_) -> ok <| As data),
-                    Error = (fun (_,_,err) -> ko <| System.Exception(err)))
-#endif
             if jsonp then
                 let fn = randomFunctionName ()
                 settings.DataType <- DataType.Jsonp
-#if ZAFIR
                 settings.Jsonp <- Union2Of2 "prefix"
                 settings.JsonpCallback <- Union2Of2 ("jsonp" + fn)
-#else
-                settings.Jsonp <- "prefix"
-                settings.JsonpCallback <- ("jsonp" + fn)
-#endif
 
             JQuery.Ajax(uri, settings) |> ignore
 

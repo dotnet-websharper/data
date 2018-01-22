@@ -54,19 +54,11 @@ module private WBRuntime =
                     AjaxSettings(
                         Url = url,
                         DataType = DataType.Jsonp,
-#if ZAFIR
                         Jsonp = Union2Of2 "prefix",
                         JsonpCallback = Union2Of2 ("jsonp" + guid),
                         Error = (fun jqXHR textStatus error -> 
                             ko <| System.Exception(textStatus + error)),
                         Success = (fun data textStatus jqXHR ->
-#else
-                        Jsonp = "prefix",
-                        JsonpCallback = ("jsonp" + guid),
-                        Error = (fun (jqXHR, textStatus, error) -> 
-                            ko <| System.Exception(textStatus + error)),
-                        Success = (fun (data, textStatus, jqXHR) ->
-#endif
                             let data = As<obj []> data
                             let res =
                                 (data.[1] :?> obj []) 

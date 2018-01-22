@@ -1,9 +1,9 @@
 namespace WebSharper.Data.Test
 
 open WebSharper
-open WebSharper.UI.Next
-open WebSharper.UI.Next.Html
-open WebSharper.UI.Next.Client
+open WebSharper.UI
+open WebSharper.UI.Html
+open WebSharper.UI.Client
 open WebSharper.Charting
 open WebSharper.JavaScript
 
@@ -38,10 +38,11 @@ module Client =
 
     let chart =
         let cfg = 
-            ChartJs.LineChartConfiguration(
-                PointDot = false,
-                BezierCurve = true,
-                DatasetFill = false)
+            ChartJs.LineConfig(
+                // PointDot = false,
+                // BezierCurve = true,
+                // DatasetFill = false
+            )
 
         async {
             let! data = schoolEnrollment
@@ -56,19 +57,19 @@ module Client =
                         .WithStrokeColor(c)
                         .WithPointColor(c))
                 |> Chart.Combine
-                |> fun c -> Renderers.ChartJs.Render(c, Size = Size(600, 400), Config = cfg)
+                |> fun c -> Renderers.ChartJs.Render(c, Size = Size(600, 400))//, Config = cfg)
         }
 
     let legend =
-        div (colors 
-             |> Array.zip countries
-             |> Array.map (fun (c, color) -> 
-                div [
-                    spanAttr [attr.style <| "width: 15px; height: 15px;
-                                             margin-right: 10px;
-                                             display: inline-block;
-                                             background-color: " + color.ToString()] []
-                    span [text c.Name]
+        div [] (colors 
+            |> Array.zip countries
+            |> Array.map (fun (c, color) -> 
+                div [] [
+                    span [attr.style <| "width: 15px; height: 15px;
+                                        margin-right: 10px;
+                                        display: inline-block;
+                                        background-color: " + color.ToString()] []
+                    span [] [text c.Name]
                 ] :> Doc))
 
     type Simple = JsonProvider<""" { "name":"John", "age":94 } """>
@@ -84,24 +85,21 @@ module Client =
             let! samples = GitHub.AsyncGetSamples()
             return 
                 samples
-                |> Seq.filter (fun issue -> issue.State = "open")
-                |> Seq.sortBy (fun issue -> System.DateTime.Now - issue.UpdatedAt)
-                |> Seq.truncate 5
+                |> Array.ofSeq
+                |> Array.filter (fun issue -> issue.State = "open")
+                |> Array.sortBy (fun issue -> System.DateTime.Now - issue.UpdatedAt)
+                |> Array.truncate 5
         }
 
-#if ZAFIR
     [<SPAEntryPoint>]
     let Main() =
-#else
-    let Main =
-#endif
         let chrt =
             chart
             |> View.ConstAsync
             |> Doc.EmbedView
 
         Doc.Concat [
-            h2 [text "Tertiary school enrollment (% gross)"]
+            h2 [] [text "Tertiary school enrollment (% gross)"]
             chrt
             legend
         ]
@@ -143,6 +141,7 @@ module Client =
 
         async {
             let! issues = topRecentlyUpdatedIssues
+            printfn "Json: issues downloaded from GitHub:"
             for issue in issues do
                 printfn "#%d %s" issue.Number issue.Title
         }

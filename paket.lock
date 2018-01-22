@@ -1,0 +1,43 @@
+STORAGE: NONE
+RESTRICTION: == net461
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Data (2.4.4)
+    Mono.Cecil (0.10.0-beta7)
+  remote: https://nuget.intellifactory.com/nuget
+    WebSharper (4.2.0.186-alpha)
+      Mono.Cecil (>= 0.10.0-beta6 < 0.11.0-beta)
+    WebSharper.Charting (4.2.0.137-alpha)
+      WebSharper (4.2.0.186-alpha)
+      WebSharper.ChartJs (4.2.0.96-alpha)
+      WebSharper.Reactive (4.2.0.88-alpha)
+      WebSharper.UI (4.2.0.47-alpha)
+    WebSharper.ChartJs (4.2.0.96-alpha)
+      WebSharper (4.2.0.186-alpha)
+    WebSharper.FSharp (4.2.0.186-alpha)
+      WebSharper (4.2.0.186-alpha)
+    WebSharper.Reactive (4.2.0.88-alpha)
+      WebSharper (4.2.0.186-alpha)
+    WebSharper.UI (4.2.0.47-alpha)
+      WebSharper (>= 4.2.0.185-alpha)
+
+GROUP build
+RESTRICTION: == net45
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    Chessie (0.6)
+      FSharp.Core
+    FAKE (4.64.4)
+    FSharp.Compiler.Tools (4.1.29)
+    FSharp.Core (4.2.3)
+    Mono.Cecil (0.10.0-beta7)
+    Newtonsoft.Json (10.0.3)
+    Paket.Core (5.108)
+      Chessie (>= 0.6)
+      FSharp.Compiler.Tools
+      FSharp.Core
+      Mono.Cecil (>= 0.10.0-beta6)
+      Newtonsoft.Json
+GITHUB
+  remote: intellifactory/websharper
+    tools/WebSharper.Fake.fsx (664381060da9ebf30559c22706652b3ac4b49f51)

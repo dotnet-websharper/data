@@ -1,0 +1,18 @@
+type file
+id WebSharper.Data
+authors
+    IntelliFactory
+owners
+    IntelliFactory
+licenseUrl http://websharper.com/licensing
+projectUrl https://github.com/intellifactory/websharper.data
+description
+    FSharp.Data proxies for WebSharper
+tags
+    Web JavaScript F# C#
+files
+    ../WebSharper.Data/bin/Release/net461/WebSharper.Data.dll ==> lib/net461
+    ../WebSharper.Data/bin/Release/net461/WebSharper.Data.xml ==> lib/net461
+dependencies
+        WebSharper LOCKEDVERSION
+        FSharp.Data LOCKEDVERSION
