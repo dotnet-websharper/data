@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFramework>net461</TargetFramework>
     <WebSharperProject>Library</WebSharperProject>
     <WebSharperSourceMap>true</WebSharperSourceMap>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
