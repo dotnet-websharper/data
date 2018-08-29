@@ -3,25 +3,25 @@ RESTRICTION: == net461
 NUGET
   remote: https://api.nuget.org/v3/index.json
     FSharp.Data (2.4.6)
-    HtmlAgilityPack (1.8.5)
+    HtmlAgilityPack (1.8.7)
     System.Xml.XDocument (4.3)
   remote: https://daily.websharper.com/nuget
-    WebSharper (4.5.0.290)
-    WebSharper.Charting (4.5.0.220)
-      WebSharper (>= 4.5 < 4.6)
+    WebSharper (4.5.1.304)
+    WebSharper.Charting (4.5.0.221)
+      WebSharper (>= 4.5.1 < 4.6)
       WebSharper.ChartJs (>= 4.5 < 4.6)
       WebSharper.Reactive (>= 4.5 < 4.6)
-      WebSharper.UI (>= 4.5 < 4.6)
-    WebSharper.ChartJs (4.5.0.137)
-      WebSharper (>= 4.5 < 4.6)
-    WebSharper.FSharp (4.5.0.290)
-      WebSharper (4.5.0.290)
-    WebSharper.Reactive (4.5.0.128)
-      WebSharper (>= 4.5 < 4.6)
-    WebSharper.UI (4.5.0.140)
+      WebSharper.UI (>= 4.5.1 < 4.6)
+    WebSharper.ChartJs (4.5.0.138)
+      WebSharper (>= 4.5.1 < 4.6)
+    WebSharper.FSharp (4.5.1.304)
+      WebSharper (4.5.1.304)
+    WebSharper.Reactive (4.5.0.129)
+      WebSharper (>= 4.5.1 < 4.6)
+    WebSharper.UI (4.5.1.141)
       HtmlAgilityPack (>= 1.7.1)
       System.Xml.XDocument (>= 4.3)
-      WebSharper (>= 4.5 < 4.6)
+      WebSharper (>= 4.5.1 < 4.6)
 
 GROUP build
 RESTRICTION: == net45
