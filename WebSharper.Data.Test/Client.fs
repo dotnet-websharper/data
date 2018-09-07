@@ -23,7 +23,7 @@ module Client =
 
     let schoolEnrollment =
         countries
-        |> Seq.map (fun c -> c.Indicators.``Out-of-school children of primary school age, both sexes (number)``)
+        |> Seq.map (fun c -> c.Indicators.``School enrollment, tertiary (gross), gender parity index (GPI)``)
         |> Async.Parallel
 
     let rand = System.Random()
@@ -38,11 +38,7 @@ module Client =
 
     let chart =
         let cfg = 
-            ChartJs.LineConfig(
-                // PointDot = false,
-                // BezierCurve = true,
-                // DatasetFill = false
-            )
+            ChartJs.LineConfig()
 
         async {
             let! data = schoolEnrollment
@@ -70,7 +66,7 @@ module Client =
                                         display: inline-block;
                                         background-color: " + color.ToString()] []
                     span [] [text c.Name]
-                ] :> Doc))
+                ]))
 
     type Simple = JsonProvider<""" { "name":"John", "age":94 } """>
     type Numbers = JsonProvider<""" [1, 2, 3, 3.5] """>

@@ -6,7 +6,7 @@ open FSharp.Data
 
 [<Proxy(typeof<Runtime.WorldBank.WorldBankData>)>]
 type private WorldBankData 
-    [<Inline "{serviceUrl: $serviceUrl, source: $sources}">] 
+    [<Inline "{serviceUrl: $serviceUrl.replace(/http:/, 'https:'), source: $sources}">] 
     (serviceUrl : string, sources : string) = 
 
     member x.ServiceUrl
