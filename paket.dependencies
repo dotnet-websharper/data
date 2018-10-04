@@ -12,6 +12,7 @@ nuget WebSharper.Reactive prerelease
 nuget WebSharper.UI prerelease
 nuget WebSharper.ChartJs prerelease
 nuget WebSharper.Charting prerelease
+nuget FSharp.Core ~> 4.2.0
 
 group build
     framework: net45

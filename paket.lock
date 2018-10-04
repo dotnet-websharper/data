@@ -2,6 +2,7 @@ STORAGE: NONE
 RESTRICTION: == net461
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (4.2.3)
     FSharp.Data (2.4.6)
     HtmlAgilityPack (1.8.7)
     System.Xml.XDocument (4.3)
