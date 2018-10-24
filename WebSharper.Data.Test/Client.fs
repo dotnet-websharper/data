@@ -102,7 +102,7 @@ module Client =
                 samples
                 |> Array.ofSeq
                 |> Array.filter (fun issue -> issue.State = "open")
-                |> Array.sortBy (fun issue -> System.DateTime.Now - issue.UpdatedAt)
+                |> Array.sortBy (fun issue -> System.DateTime.Now - issue.UpdatedAt.DateTime)
                 |> Array.truncate 5
         }
 

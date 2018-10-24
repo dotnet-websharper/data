@@ -98,7 +98,7 @@ type private JsonDocument =
     static member Create(value : JsonValue, path : string) : Runtime.BaseTypes.IJsonDocument = As value
 
     [<Inline; JavaScript>]
-    static member Create(reader:System.IO.TextReader, cultureStr:string): Runtime.BaseTypes.IJsonDocument =
+    static member Create(reader:System.IO.TextReader): Runtime.BaseTypes.IJsonDocument =
         let data = As<obj> reader 
         if JS.TypeOf data = JS.Kind.String then 
             As <| JSON.Parse (As data)
@@ -211,6 +211,9 @@ type private JsonRuntime =
     
     [<Inline; JavaScript>]
     static member ConvertDateTime(cultureStr : string, json : JsonValue option) : System.DateTime option = As json
+
+    [<Inline; JavaScript>]
+    static member ConvertDateTimeOffset(cultureStr : string, json : JsonValue option) : System.DateTimeOffset option = As<System.DateTime option> json |> Option.map System.DateTimeOffset
     
     [<Inline; JavaScript>]
     static member ConvertGuid(json : JsonValue option) : System.Guid option = As json
