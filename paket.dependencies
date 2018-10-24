@@ -3,7 +3,7 @@ source https://api.nuget.org/v3/index.json
 source https://daily.websharper.com/nuget
 
 storage: none
-framework: net461
+framework: net461, netstandard2.0
 
 nuget WebSharper prerelease
 nuget WebSharper.FSharp prerelease
@@ -12,7 +12,7 @@ nuget WebSharper.Reactive prerelease
 nuget WebSharper.UI prerelease
 nuget WebSharper.ChartJs prerelease
 nuget WebSharper.Charting prerelease
-nuget FSharp.Core ~> 4.2.0
+nuget FSharp.Core ~> 4.3.4
 
 group build
     framework: net45
