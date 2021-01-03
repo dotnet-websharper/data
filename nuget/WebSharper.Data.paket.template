@@ -16,5 +16,5 @@ files
     ../WebSharper.Data/bin/Release/netstandard2.0/WebSharper.Data.dll ==> lib/netstandard2.0
     ../WebSharper.Data/bin/Release/netstandard2.0/WebSharper.Data.xml ==> lib/netstandard2.0
 dependencies
-        WebSharper ~> LOCKEDVERSION/3
-        FSharp.Data ~> LOCKEDVERSION/3
+        WebSharper ~> LOCKEDVERSION:[3]
+        FSharp.Data ~> LOCKEDVERSION:[3]
